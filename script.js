@@ -1,73 +1,108 @@
 const API_KEY = '040c7d694009e3beba1ac79c7d003886';
-let lastfmUser = localStorage.getItem('lastfm_user');
+let config = {
+    user: localStorage.getItem('lastfm_user') || '',
+    theme: localStorage.getItem('app_theme') || 'theme-dark-default',
+    potato: localStorage.getItem('potato_mode') === 'true'
+};
+let currentTrack = null;
 
-// --- Orologio ---
-function updateClock() {
-    const now = new Date();
-    const parts = {
-        hours: String(now.getHours()).padStart(2, '0'),
-        minutes: String(now.getMinutes()).padStart(2, '0'),
-        seconds: String(now.getSeconds()).padStart(2, '0')
-    };
+const overlay = document.getElementById('modal-container');
+const panelSettings = document.getElementById('panel-settings');
+const panelMusic = document.getElementById('panel-music');
 
-    for (const [unit, value] of Object.entries(parts)) {
-        const el = document.getElementById(unit);
-        if (el.textContent !== value) {
-            el.style.transform = "scale(0.95)";
-            el.style.opacity = "0.7";
-            setTimeout(() => {
-                el.textContent = value;
-                el.style.transform = "scale(1)";
-                el.style.opacity = "1";
-            }, 100);
-        }
-    }
+function init() {
+    document.body.className = config.theme;
+    if(config.potato) document.body.classList.add('potato-mode');
+    document.getElementById('username-input').value = config.user;
+    document.getElementById('potato-mode').checked = config.potato;
+    
+    updateClock();
+    fetchMusic();
+    setInterval(updateClock, 1000);
+    setInterval(fetchMusic, 15000);
 }
 
-// --- Last.fm ---
-async function fetchMusic() {
-    if (!lastfmUser) return;
+// GESTIONE MODALI
+document.getElementById('menu-toggle').onclick = () => {
+    openModal(panelSettings);
+};
 
-    try {
-        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${lastfmUser}&api_key=${API_KEY}&format=json&limit=1`;
-        const response = await fetch(url);
-        const data = await response.json();
-        const track = data.recenttracks.track[0];
-        
-        const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
-        const widget = document.getElementById('music-widget');
-        const bg = document.getElementById('dynamic-bg');
+document.getElementById('music-widget').onclick = () => {
+    showMusicDetails();
+};
 
-        if (isNowPlaying) {
-            const imgUrl = track.image[3]['#text'];
-            document.getElementById('track-title').textContent = track.name;
-            document.getElementById('track-artist').textContent = track.artist['#text'];
-            document.getElementById('track-art').src = imgUrl || 'https://via.placeholder.com/100';
-            
-            widget.classList.remove('hidden');
-            // Aggiorna lo sfondo con la copertina dell'album
-            if (imgUrl) bg.style.backgroundImage = `radial-gradient(circle, rgba(2,6,23,0.7) 30%, #020617), url(${imgUrl})`;
-        } else {
-            widget.classList.add('hidden');
-            bg.style.backgroundImage = 'none';
-        }
-    } catch (err) {
-        console.warn("Errore API:", err);
-    }
+function openModal(panel) {
+    panelSettings.classList.add('hidden');
+    panelMusic.classList.add('hidden');
+    panel.classList.remove('hidden');
+    overlay.classList.add('active');
 }
 
-// --- Configurazione ---
-document.getElementById('config-btn').addEventListener('click', () => {
-    const user = prompt("Inserisci il tuo nome utente Last.fm:", lastfmUser || "");
-    if (user !== null) {
-        localStorage.setItem('lastfm_user', user);
-        lastfmUser = user;
-        fetchMusic();
-    }
+document.querySelectorAll('.close-modal, .overlay').forEach(el => {
+    el.onclick = (e) => { if(e.target === overlay || el.classList.contains('close-modal')) overlay.classList.remove('active'); };
 });
 
-// Inizializzazione
-setInterval(updateClock, 1000);
-setInterval(fetchMusic, 15000); // Controlla ogni 15 sec
-updateClock();
-fetchMusic();
+// SALVATAGGIO
+document.getElementById('save-btn').onclick = () => {
+    config.user = document.getElementById('username-input').value;
+    config.potato = document.getElementById('potato-mode').checked;
+    localStorage.setItem('lastfm_user', config.user);
+    localStorage.setItem('potato_mode', config.potato);
+    location.reload(); // Per applicare potato mode e reset in modo pulito
+};
+
+// TEMI
+document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.onclick = () => {
+        config.theme = 'theme-' + btn.dataset.theme;
+        document.body.className = config.theme;
+        localStorage.setItem('app_theme', config.theme);
+    };
+});
+
+// OROLOGIO
+function updateClock() {
+    const now = new Date();
+    document.getElementById('hours').innerText = String(now.getHours()).padStart(2, '0');
+    document.getElementById('minutes').innerText = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('seconds').innerText = String(now.getSeconds()).padStart(2, '0');
+}
+
+// MUSICA
+async function fetchMusic() {
+    if(!config.user) return;
+    try {
+        const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${config.user}&api_key=${API_KEY}&format=json&limit=1`);
+        const d = await r.json();
+        const track = d.recenttracks.track[0];
+        const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+
+        if(isPlaying) {
+            currentTrack = track;
+            document.getElementById('music-widget').classList.remove('hidden');
+            document.getElementById('track-name').innerText = track.name;
+            document.getElementById('track-artist-small').innerText = track.artist['#text'];
+            document.getElementById('track-art').src = track.image[2]['#text'];
+        } else {
+            document.getElementById('music-widget').classList.add('hidden');
+        }
+    } catch(e) {}
+}
+
+async function showMusicDetails() {
+    if(!currentTrack) return;
+    openModal(panelMusic);
+    document.getElementById('detail-title').innerText = currentTrack.name;
+    document.getElementById('detail-artist').innerText = currentTrack.artist['#text'];
+    document.getElementById('detail-art').src = currentTrack.image[3]['#text'];
+
+    try {
+        const r = await fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${API_KEY}&artist=${encodeURIComponent(currentTrack.artist['#text'])}&track=${encodeURIComponent(currentTrack.name)}&username=${config.user}&format=json`);
+        const d = await r.json();
+        document.getElementById('info-album').innerText = d.track.album?.title || "N/A";
+        document.getElementById('info-plays').innerText = d.track.userplaycount || "0";
+        document.getElementById('lastfm-link').href = d.track.url;
+    } catch(e) {}
+}
+
+init();
