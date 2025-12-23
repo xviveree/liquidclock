@@ -1,0 +1,143 @@
+:root {
+    --bg-dark: #020617;
+    --glass-fill: rgba(255, 255, 255, 0.08);
+    --glass-stroke: rgba(255, 255, 255, 0.15);
+    --accent: #38bdf8;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    background-color: var(--bg-dark);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    color: white;
+    overflow: hidden;
+}
+
+/* Sfondo con gradienti liquidi */
+.background-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-size: cover;
+    background-position: center;
+    transition: background 1s ease-in-out;
+    filter: brightness(0.4) saturate(1.2);
+}
+
+.gradient-blobs {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+    filter: blur(60px);
+}
+
+/* Orologio */
+.clock-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.glass-card {
+    background: var(--glass-fill);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-stroke);
+    border-radius: 30px;
+    padding: 35px;
+    min-width: 120px;
+    font-size: 6rem;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.glass-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.dots {
+    font-size: 3rem;
+    opacity: 0.5;
+    animation: pulse 1s infinite;
+}
+
+/* Widget Musica */
+.music-card {
+    position: fixed;
+    bottom: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-stroke);
+    padding: 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 280px;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.music-card.hidden { transform: translateY(150px); opacity: 0; }
+
+#track-art {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.track-details { overflow: hidden; }
+
+.marquee-box { width: 180px; overflow: hidden; white-space: nowrap; }
+
+.marquee-text {
+    display: inline-block;
+    font-weight: 600;
+    animation: marquee 10s linear infinite;
+}
+
+#track-artist {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    display: block;
+}
+
+/* UI Elements */
+.glass-btn {
+    background: var(--glass-fill);
+    border: 1px solid var(--glass-stroke);
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.config-pos { position: absolute; top: 20px; right: 20px; }
+.glass-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(45deg); }
+
+/* Animazioni */
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+@keyframes pulse {
+    50% { opacity: 0.1; }
+}
