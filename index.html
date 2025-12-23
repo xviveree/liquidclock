@@ -3,32 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liquid Glass Clock & Music</title>
+    <title>Liquid Glass Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div id="dynamic-bg" class="background-overlay"></div>
-    <div class="gradient-blobs"></div>
+<body class="theme-dark-default">
+    <div class="liquid-bg"></div>
 
-    <button id="config-btn" class="glass-btn config-pos">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-    </button>
+    <header class="top-interface">
+        <button id="menu-toggle" class="glass-btn icon-btn">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+    </header>
 
-    <main class="clock-wrapper">
-        <div class="glass-card" id="hours">00</div>
-        <div class="dots">:</div>
-        <div class="glass-card" id="minutes">00</div>
-        <div class="dots">:</div>
-        <div class="glass-card" id="seconds">00</div>
+    <div id="modal-container" class="overlay">
+        <div id="panel-settings" class="glass-card modal-panel hidden">
+            <h3>Settings</h3>
+            <div class="menu-scroll">
+                <div class="section">
+                    <label>Last.fm Username</label>
+                    <input type="text" id="username-input" class="glass-input" placeholder="User">
+                    <div class="row">
+                        <span>Potato Mode</span>
+                        <input type="checkbox" id="potato-mode" class="apple-switch">
+                    </div>
+                </div>
+                <div class="section">
+                    <label>Themes</label>
+                    <div class="theme-grid">
+                        <button class="theme-btn d-def" data-theme="dark-default"></button>
+                        <button class="theme-btn l-def" data-theme="light-default"></button>
+                        <button class="theme-btn d-sage" data-theme="dark-sage"></button>
+                        <button class="theme-btn l-sage" data-theme="light-sage"></button>
+                        <button class="theme-btn d-rose" data-theme="dark-rose"></button>
+                        <button class="theme-btn l-rose" data-theme="light-rose"></button>
+                    </div>
+                </div>
+            </div>
+            <button id="save-btn" class="solid-btn">Save Changes</button>
+        </div>
+
+        <div id="panel-music" class="glass-card modal-panel hidden">
+            <img id="detail-art" src="" alt="">
+            <h2 id="detail-title">Title</h2>
+            <p id="detail-artist">Artist</p>
+            <div class="stats-grid">
+                <div class="stat"><span>Album</span><p id="info-album">-</p></div>
+                <div class="stat"><span>Plays</span><p id="info-plays">-</p></div>
+            </div>
+            <a id="lastfm-link" href="#" target="_blank" class="solid-btn">Open on Last.fm</a>
+            <button class="close-modal glass-btn">Back</button>
+        </div>
+    </div>
+
+    <main class="center-content">
+        <div class="clock-wrap">
+            <div class="glass-card digit" id="hours">00</div>
+            <div class="sep">:</div>
+            <div class="glass-card digit" id="minutes">00</div>
+            <div class="sep seconds-dots">:</div>
+            <div class="glass-card digit seconds-card" id="seconds">00</div>
+        </div>
     </main>
 
-    <footer id="music-widget" class="music-card hidden">
-        <img id="track-art" src="" alt="Album Cover">
-        <div class="track-details">
-            <div class="marquee-box">
-                <span id="track-title" class="marquee-text"></span>
+    <footer id="music-widget" class="music-trigger hidden">
+        <div class="glass-card music-pill">
+            <img id="track-art" src="" alt="">
+            <div class="meta">
+                <span id="track-name" class="name"></span>
+                <span id="track-artist-small" class="artist"></span>
             </div>
-            <span id="track-artist"></span>
         </div>
     </footer>
 
